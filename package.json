@@ -2,6 +2,7 @@
     "author": "Mihai Ene <dkrandu@yahoo.com>",
         "name": "srcds-rcon",
         "description": "A node.js driver for the SRCDS RCON",
+        "keywords": ["valve", "srcds", "hlds", "rcon", "half", "life", "counter", "strike"],
         "version": "1.0.0-rc1",
         "homepage": "https://github.com/randunel/node-srcds-rcon",
         "repository": {
