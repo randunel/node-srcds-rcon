@@ -1,0 +1,18 @@
+{
+    "author": "Mihai Ene <dkrandu@yahoo.com>",
+        "name": "srcds-rcon",
+        "description": "A node.js driver for the SRCDS RCON",
+        "version": "1.0.0-rc1",
+        "homepage": "https://github.com/randunel/node-srcds-rcon",
+        "repository": {
+            "type": "git",
+            "url": "https://github.com/randunel/node-srcds-rcon"
+        },
+        "main": "./index",
+        "engines": {
+            "node": "*"
+        },
+        "dependencies": {},
+        "devDependencies": {},
+        "optionalDependencies": {}
+}
