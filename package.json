@@ -3,7 +3,7 @@
         "name": "srcds-rcon",
         "description": "A node.js driver for the SRCDS RCON",
         "keywords": ["valve", "srcds", "hlds", "rcon", "half", "life", "counter", "strike"],
-        "version": "1.1.1",
+        "version": "1.1.2",
         "homepage": "https://github.com/randunel/node-srcds-rcon",
         "repository": {
             "type": "git",
