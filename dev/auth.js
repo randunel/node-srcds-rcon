@@ -1,13 +1,9 @@
-var Protocol = require('../lib/protocol/Protocol.js');
+var Rcon = require('../lib/Rcon.js');
 
-var protocol = new Protocol( {
-    server: {
-        host: '127.0.1.1',
-        port: 27015
-    },
-    password: 'test'
-});
+var rcon = new Rcon('127.0.1.1:27015', 'test');
 
-protocol.exec('status', function(res) {
+rcon.connect();
+
+rcon.exec('status', function(res) {
     console.log('Got res', res);
 });
