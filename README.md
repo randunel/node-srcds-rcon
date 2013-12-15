@@ -35,6 +35,6 @@ rcon.connect(function() {
 
 ## Known issues
 
- - Don't keep the SRCDS console open when initializing the service. The internal watchdog timer detects a timeout due to the console's slow display speed and aborts, dumps the core and restarts the server. You may open the SRCDS console afterwards. There is a workaround, settings watchdog's timeout to a higher value, but it is currently not accesible.
+ - Don't keep the SRCDS console open when initializing the service. The internal watchdog timer detects a timeout due to the console's slow display speed and aborts, dumps the core and restarts the server. You may open the SRCDS console afterwards. There are two workarounds, setting watchdog's timeout to a higher value which may not be accesible, or disabling logging to console which may hinder debugging.
  - Rcon's internal cvar state is not maintained, the settings in `rcon.commands` are only valid after initialization, and must be considered outdated afterwards. That goes down as **work in progress**, feel free to assist.
  - Error handling - mostly works, haven't encountered that many during tests
