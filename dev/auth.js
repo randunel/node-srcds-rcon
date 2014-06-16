@@ -1,6 +1,6 @@
 var Rcon = require('../lib/Rcon.js');
 
-var rcon = new Rcon('127.0.1.1:27015', 'test');
+var rcon = new Rcon('192.168.0.2:27015', 'test');
 
 rcon.connect(function() {
     //console.log(rcon);
