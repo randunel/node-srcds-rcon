@@ -1,11 +1,12 @@
 'use strict';
 
 let rcon = require('..')({
-    address: '127.0.1.1:53',
+    address: '192.168.1.10',
     password: 'test'
 });
 
 rcon.connect().then(() => {
+    console.log('running command1');
     return rcon.command('sv_airaccelerate 10').then(res => {
         console.log('got res', res);
     });
@@ -15,5 +16,6 @@ rcon.connect().then(() => {
     });
 }).catch(err => {
     console.log('caught', err);
+    console.log(err.stack);
 });
 

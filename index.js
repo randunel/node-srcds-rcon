@@ -1,7 +1,5 @@
 'use strict';
 
-var Buffer = require('buffer');
-
 let Connection = require('./lib/connection');
 let packet = require('./lib/packet');
 let util = require('./lib/util');
@@ -31,7 +29,7 @@ module.exports = params => {
         connection.send(buf);
         return Promise.race([
             util.promiseTimeout(3000).then(() => 'timeout'),
-            connection.getData()
+            connection.getData(dataHandler)
         ]).then(data => {
             // TODO: data as a single type, not string/object
             if ('timeout' === data) {
@@ -43,8 +41,16 @@ module.exports = params => {
                 let err = new Error('Wrong rcon password');
                 throw err;
             }
-            _init(connection);
+            // Auth successful, but continue after receiving packet index
+            return connection.getData(dataHandler).then(() => {
+                _init(connection);
+            });
         });
+
+        function dataHandler() {
+            // Auth response should only return 1 packet
+            return false;
+        }
     }
 
     function _init(connection) {
@@ -53,7 +59,7 @@ module.exports = params => {
     }
 
     function _getNextPacketId() {
-        return ++nextPacketId;
+        return nextPacketId += 1;
     }
 
     function command(text) {
@@ -73,20 +79,20 @@ module.exports = params => {
             });
             _connection.send(req);
             _connection.send(ack);
-            _connection.getData().then(dataHandler);
+            _connection.getData(dataHandler).then(done);
 
             function dataHandler(data) {
                 let res = packet.response(data);
                 if (res.id === ackId) {
-                    sendResponse();
+                    return false;
                 } else if (res.id === reqId) {
                     // More data to come
                     responseData = Buffer.concat([responseData, res.payload], responseData.length + res.payload.length);
-                    _connection.getData().then(dataHandler);
                 }
+                return true;
             }
 
-            function sendResponse() {
+            function done() {
                 let text = packet.convertPayload(responseData);
                 resolve(text);
             }
