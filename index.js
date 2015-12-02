@@ -23,14 +23,12 @@ module.exports = params => {
     }
 
     function _auth(connection) {
-        console.log('packet is', packet);
         let buf = packet.request({
             id: 1,
             type: packet.SERVERDATA_AUTH,
             body: password
         });
         connection.send(buf);
-        console.log('starting race');
         return Promise.race([
             util.promiseTimeout(3000).then(() => 'timeout'),
             connection.getData()
