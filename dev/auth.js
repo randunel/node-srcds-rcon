@@ -1,20 +1,19 @@
-var Rcon = require('../lib/Rcon.js');
+'use strict';
 
-//var rcon = new Rcon('192.168.0.2:27015', 'test');
-var rcon = new Rcon({
-    address: '192.168.0.2:27015',
-    password: 'test',
-    initCvars: false
+let rcon = require('..')({
+    address: '127.0.1.1:53',
+    password: 'test'
 });
 
-rcon.connect(function() {
-    //rcon.sv_airaccelerate(10, function(err, res) {
-    rcon.runCommand('sv_airaccelerate 10', function(err, res) {
-        console.log('sv_airaccelerate server response', res);
-        //rcon.changelevel('de_dust2', function(err, res) {
-        rcon.runCommand('changelevel de_dust2', function(err, res) {
-            !err && console.log('Changed map to de_dust2');
-        });
+rcon.connect().then(() => {
+    return rcon.command('sv_airaccelerate 10').then(res => {
+        console.log('got res', res);
     });
+}).then(() => {
+    return rcon.command('changelevel de_dust2').then(res => {
+        console.log('got res', res);
+    });
+}).catch(err => {
+    console.log('caught', err);
 });
 
