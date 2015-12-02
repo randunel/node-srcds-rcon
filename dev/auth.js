@@ -6,15 +6,15 @@ let rcon = require('..')({
 });
 
 rcon.connect().then(() => {
-    return rcon.command('sv_airaccelerate 10').then(res => {
-        console.log('got res1', res);
+    return rcon.command('sv_airaccelerate 10').then(() => {
+        console.log('changed sv_airaccelerate');
     });
 }).then(
-    () => rcon.command('status').then(res => console.log('got res2', res))
+    () => rcon.command('status').then(status => console.log(`got status ${status}`))
 ).then(
-    () => rcon.command('cvarlist').then(res => console.log('got res3', res))
+    () => rcon.command('cvarlist').then(cvarlist => console.log(`cvarlist is \n${cvarlist}`))
 ).then(
-    () => rcon.command('changelevel de_dust2').then(res => console.log('got res4', res))
+    () => rcon.command('changelevel de_dust2').then(() => console.log('changed map'))
 ).catch(err => {
     console.log('caught', err);
     console.log(err.stack);

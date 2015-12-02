@@ -16,29 +16,29 @@ If you think the npm version is outdated, you may install from github
 
 This is a node driver for SRCDS's RCON. While it should work on all SRCDS versions, it has only been tested against the Source 2009 (orangebox) protocol.
 
-## Example
+The current version `2.x` requires node.js version 4.x or newer. For older node.js versions including 0.8, install srcds-rcon `1.1.7`. All development uses node.js 5.x.
+
+## Usage
 
 ``` javascript
-var Rcon = require('srcds-rcon');
+let rcon = require('srcds-rcon')({
+    address: '192.168.1.10',
+    password: 'test'
+});
 
-var rcon = new Rcon('127.0.1.1:27015', 'mySecretRconPassword');
-
-rcon.connect(function() {
-    rcon.sv_airaccelerate(6, function(err, res) {
-        console.log('sv_airaccelerate set to 6', res);
-        rcon.changelevel('de_dust2', function(err, res) {
-            console.log('Changed map to de_dust2');
-        });
+rcon.connect().then(() => {
+    return rcon.command('sv_airaccelerate 10').then(res => {
+        console.log('changed sv_airaccelerate');
     });
+}).then(
+    () => rcon.command('status').then(status => console.log('got status', status))
+).then(
+    () => rcon.command('cvarlist').then(cvarlist => console.log('cvarlist is'))
+).then(
+    () => rcon.command('changelevel de_dust2').then(res => console.log('changed map'))
+).catch(err => {
+    console.log('caught', err);
+    console.log(err.stack);
 });
 ```
-
-## Known issues
-
- - Don't keep the SRCDS console open when initializing the service. The internal watchdog timer detects a timeout due to the console's slow display speed and aborts, dumps the core and restarts the server. You may open the SRCDS console afterwards. There are two workarounds, setting watchdog's timeout to a higher value which may not be accesible, or disabling logging to console which may hinder debugging.
- - Rcon's internal cvar state is not maintained, the settings in `rcon.commands` are only valid after initialization, and must be considered outdated afterwards. That goes down as **work in progress**, feel free to assist.
- - Error handling - mostly works, haven't encountered that many during tests
-
-
-[![Bitdeli Badge](https://d2weczhvl823v0.cloudfront.net/randunel/node-srcds-rcon/trend.png)](https://bitdeli.com/free "Bitdeli Badge")
 
