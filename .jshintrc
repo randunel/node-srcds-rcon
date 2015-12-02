@@ -1,0 +1,12 @@
+{
+    "esnext": true,
+    "node": true,
+    "unused": true,
+    "undef": true,
+    "newcap": false,
+    "predef": [
+        "describe",
+    "it"
+        ]
+}
+
