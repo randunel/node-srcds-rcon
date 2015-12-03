@@ -1,6 +1,6 @@
 {
     "name": "srcds-rcon",
-    "version": "2.0.0",
+    "version": "2.0.1",
     "description": "A node.js driver for the SRCDS RCON",
     "main": "index.js",
     "scripts": {
