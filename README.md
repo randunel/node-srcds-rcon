@@ -59,7 +59,9 @@ rcon.connect().then(() => {
 
 #### Specify command timeout
 
+``` javascript
 rcon.command('cvarlist', 1000).then(console.log, console.error);
+```
 
 ## Errors
 
@@ -72,6 +74,7 @@ rcon.command('cvarlist').then(() => {}).catch(err => {
         console.log(`Got partial response: ${err.details.partialResponse}`);
     }
 });
+```
 
 When an error is returned, even if an error doesn't contain a partial output, there is no guarantee the command was not run. The protocol uses udp and the packets sometimes get lost. The only guarantee is when the error does contain a partial output, the command was definitely run, but some reply packets got lost.
 
