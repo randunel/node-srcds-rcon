@@ -20,6 +20,21 @@ The current version `2.x` requires node.js version 4.x or newer. For older node.
 
 ## Usage
 
+#### First establish connection
+
+``` javascript
+let Rcon = require('srcds-rcon');
+let rcon = Rcon({
+    address: '192.168.1.10',
+    password: 'test'
+});
+rcon.connect().then(() => {
+    console.log('connected');
+}).catch(console.error);
+```
+
+#### Run commands
+
 ``` javascript
 let rcon = require('srcds-rcon')({
     address: '192.168.1.10',
@@ -41,4 +56,22 @@ rcon.connect().then(() => {
     console.log(err.stack);
 });
 ```
+
+#### Specify command timeout
+
+rcon.command('cvarlist', 1000).then(console.log, console.error);
+
+## Errors
+
+Some errors may contain partial command output. That indicates that the command was run, but reply packets have been lost.
+
+``` javascript
+rcon.command('cvarlist').then(() => {}).catch(err => {
+    console.log(`Command error: ${err.message}`);
+    if (err.details && err.details.partialResponse) {
+        console.log(`Got partial response: ${err.details.partialResponse}`);
+    }
+});
+
+When an error is returned, even if an error doesn't contain a partial output, there is no guarantee the command was not run. The protocol uses udp and the packets sometimes get lost. The only guarantee is when the error does contain a partial output, the command was definitely run, but some reply packets got lost.
 

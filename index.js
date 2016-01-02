@@ -28,18 +28,17 @@ module.exports = params => {
         });
         connection.send(buf);
         return Promise.race([
-            util.promiseTimeout(3000).then(() => 'timeout'),
+            util.promiseTimeout(3000).then(() => {
+                let err = new Error('Auth timeout');
+                return Promise.reject(err);
+            }),
             connection.getData(dataHandler)
         ]).then(data => {
             // TODO: data as a single type, not string/object
-            if ('timeout' === data) {
-                let err = new Error('Auth timeout');
-                throw err;
-            }
             let res = packet.response(data);
             if (res.id === -1) {
                 let err = new Error('Wrong rcon password');
-                throw err;
+                return Promise.reject(err);
             }
             // Auth successful, but continue after receiving packet index
             return connection.getData(dataHandler).then(() => {
@@ -62,41 +61,87 @@ module.exports = params => {
         return nextPacketId += 1;
     }
 
-    function command(text) {
-        return new Promise(resolve => {
-            let responseData = new Buffer(0);
-            let reqId = _getNextPacketId();
-            let req = packet.request({
-                id: reqId,
-                type: packet.SERVERDATA_EXECCOMMAND,
-                body: text
-            });
-            let ackId = _getNextPacketId();
-            let ack = packet.request({
-                id: ackId,
-                type: packet.SERVERDATA_EXECCOMMAND,
-                body: ''
-            });
-            _connection.send(req);
-            _connection.send(ack);
-            _connection.getData(dataHandler).then(done);
+    function command(text, timeout) {
+        return Promise.race([
+            new Promise((resolve, reject) => {
+                let unexpectedPackets;
 
-            function dataHandler(data) {
-                let res = packet.response(data);
-                if (res.id === ackId) {
-                    return false;
-                } else if (res.id === reqId) {
-                    // More data to come
-                    responseData = Buffer.concat([responseData, res.payload], responseData.length + res.payload.length);
+                let responseData = new Buffer(0);
+                let reqId = _getNextPacketId();
+                let req = packet.request({
+                    id: reqId,
+                    type: packet.SERVERDATA_EXECCOMMAND,
+                    body: text
+                });
+                let ackId = _getNextPacketId();
+                let ack = packet.request({
+                    id: ackId,
+                    type: packet.SERVERDATA_EXECCOMMAND,
+                    body: ''
+                });
+                _connection.send(req);
+                _connection.send(ack);
+                _connection.getData(dataHandler).then(done);
+
+                function dataHandler(data) {
+                    let res = packet.response(data);
+                    if (res.id === ackId) {
+                        return false;
+                    } else if (res.id === reqId) {
+                        // More data to come
+                        responseData = Buffer.concat([responseData, res.payload], responseData.length + res.payload.length);
+                        return true;
+                    } else {
+                        return handleUnexpectedData(res.id);
+                    }
                 }
-                return true;
-            }
 
-            function done() {
-                let text = packet.convertPayload(responseData);
-                resolve(text);
-            }
-        });
+                function done() {
+                    let text = packet.convertPayload(responseData);
+                    resolve(text);
+                }
+
+                function handleUnexpectedData(id) {
+                    // Unexpected res.id, possibly from other commands
+                    if (reqId > id) {
+                        // Do nothing and keep listening, packets from older
+                        // commands are still coming in
+                        return true;
+                    }
+                    if ('undefined' === typeof unexpectedPackets) {
+                        unexpectedPackets = new Map();
+                    }
+                    if (!unexpectedPackets.has(id)) {
+                        if (unexpectedPackets.size >= 2) {
+                            let err = new Error('Command lost');
+                            err.details = {
+                                reqId: reqId
+                            };
+                            if (responseData.length > 0) {
+                                err.details.partialResponse = packet.convertPayload(responseData);
+                            }
+                            reject(err);
+                            return false;
+                        }
+                        unexpectedPackets.set(id, 1);
+                        return true;
+                    }
+                    unexpectedPackets.set(id, unexpectedPackets.get(id) + 1);
+                    return true;
+                }
+            }),
+            new Promise((resolve, reject) => {
+                if ('number' === typeof timeout) {
+                    return util.promiseTimeout(timeout).then(() => {
+                        let err = new Error('Command timeout');
+                        err.details = {
+                            timeout: timeout
+                        };
+                        reject(err);
+                    });
+                }
+            })
+        ]);
     }
 };
 
