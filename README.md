@@ -76,5 +76,5 @@ rcon.command('cvarlist').then(() => {}).catch(err => {
 });
 ```
 
-When an error is returned, even if an error doesn't contain a partial output, there is no guarantee the command was not run. The protocol uses udp and the packets sometimes get lost. The only guarantee is when the error does contain a partial output, the command was definitely run, but some reply packets got lost.
+When an error is returned, even if it doesn't contain a partial output, there is no guarantee the command was not run. The protocol uses udp and the packets sometimes get lost. The only guarantee the command did run is when the error contains a partial output.
 
