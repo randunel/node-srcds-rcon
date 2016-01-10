@@ -18,6 +18,12 @@ This is a node driver for SRCDS's RCON. While it should work on all SRCDS versio
 
 The current version `2.x` requires node.js version 4.x or newer. For older node.js versions including 0.8, install srcds-rcon `1.1.7`. All development uses node.js 5.x.
 
+## Testing
+
+Install dev dependencies (`npm install` does that by default). Set up a csgo server and bind it to `127.0.0.1:27015`, run it with `-usercon` and `rcon_password test`. Then run `make test`.
+
+Alternatively, set up a different server and edit `test/integration.test.js` `getIntegrationAuth` to return login details to the desired test server.
+
 ## Usage
 
 #### First establish connection
