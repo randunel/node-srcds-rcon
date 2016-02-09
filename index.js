@@ -12,12 +12,19 @@ module.exports = params => {
 
     return Object.freeze({
         connect: connect,
-        command: command
+        command: command,
+        disconnect: disconnect
     });
 
     function connect() {
         let connection = Connection(address);
         return connection.create().then(() => _auth(connection));
+    }
+
+    function disconnect() {
+        return _connection.destroy().then(() => {
+            _connection = undefined;
+        });
     }
 
     function _auth(connection) {
@@ -144,4 +151,3 @@ module.exports = params => {
         ]);
     }
 };
-
