@@ -71,6 +71,10 @@ module.exports = params => {
     function command(text, timeout) {
         return Promise.race([
             new Promise((resolve, reject) => {
+                if (!_connection) {
+                    reject(new Error('not connected'));
+                }
+
                 let unexpectedPackets;
 
                 let responseData = new Buffer(0);
