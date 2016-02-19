@@ -57,6 +57,8 @@ rcon.connect().then(() => {
     () => rcon.command('cvarlist').then(cvarlist => console.log(`cvarlist is \n${cvarlist}`))
 ).then(
     () => rcon.command('changelevel de_dust2').then(() => console.log('changed map'))
+).then(
+    () => rcon.disconnect()
 ).catch(err => {
     console.log('caught', err);
     console.log(err.stack);
@@ -67,6 +69,12 @@ rcon.connect().then(() => {
 
 ``` javascript
 rcon.command('cvarlist', 1000).then(console.log, console.error);
+```
+
+#### Disconnect once finished
+
+``` javascript
+rcon.disconnect();
 ```
 
 ## Errors

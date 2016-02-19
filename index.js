@@ -12,12 +12,19 @@ module.exports = params => {
 
     return Object.freeze({
         connect: connect,
-        command: command
+        command: command,
+        disconnect: disconnect
     });
 
     function connect() {
         let connection = Connection(address);
         return connection.create().then(() => _auth(connection));
+    }
+
+    function disconnect() {
+        return _connection.destroy().then(() => {
+            _connection = undefined;
+        });
     }
 
     function _auth(connection) {
@@ -64,6 +71,10 @@ module.exports = params => {
     function command(text, timeout) {
         return Promise.race([
             new Promise((resolve, reject) => {
+                if (!_connection) {
+                    reject(new Error('not connected'));
+                }
+
                 let unexpectedPackets;
 
                 let responseData = new Buffer(0);
@@ -144,4 +155,3 @@ module.exports = params => {
         ]);
     }
 };
-
